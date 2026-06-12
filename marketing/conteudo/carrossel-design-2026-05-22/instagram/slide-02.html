@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    html, body { margin: 0; padding: 0; background: #0D0F2D; }
+    .slide {
+      width: 1080px;
+      height: 1350px;
+      box-sizing: border-box;
+      font-family: 'Inter', system-ui, sans-serif;
+      position: relative;
+      overflow: hidden;
+      background: #0D0F2D;
+      color: #FAFAF7;
+    }
+
+    /* Gradiente de fundo */
+    .bg-gradient {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 80% 20%, rgba(0,245,200,0.12) 0%, transparent 60%),
+                  radial-gradient(ellipse at 20% 80%, rgba(60,80,200,0.15) 0%, transparent 55%);
+    }
+
+    /* Número GIGANTE decorativo */
+    .bg-number {
+      position: absolute;
+      right: -30px;
+      top: 60px;
+      font-size: 500px;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -0.06em;
+      color: rgba(0,245,200,0.06);
+      user-select: none;
+      pointer-events: none;
+    }
+
+    /* Header */
+    .header {
+      position: absolute;
+      top: 64px;
+      left: 80px;
+      right: 80px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: rgba(250,250,247,0.3);
+    }
+    .counter {
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      color: rgba(250,250,247,0.25);
+    }
+
+    /* Conteúdo */
+    .content {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      left: 80px;
+      right: 80px;
+    }
+
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.30em;
+      text-transform: uppercase;
+      color: #00F5C8;
+      margin-bottom: 28px;
+    }
+    .eyebrow-rule {
+      flex: 0 0 40px;
+      height: 2px;
+      background: #00F5C8;
+    }
+
+    /* O número principal como elemento de design */
+    .numero-principal {
+      font-size: 240px;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -0.05em;
+      color: #00F5C8;
+      margin-bottom: -16px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .rule {
+      width: 64px;
+      height: 4px;
+      background: #00F5C8;
+      margin-bottom: 36px;
+      border-radius: 2px;
+    }
+
+    h2 {
+      margin: 0 0 28px 0;
+      font-size: 68px;
+      font-weight: 800;
+      line-height: 1.02;
+      letter-spacing: -0.035em;
+      color: #FAFAF7;
+    }
+
+    .body {
+      font-size: 22px;
+      font-weight: 400;
+      line-height: 1.55;
+      color: rgba(250,250,247,0.60);
+      max-width: 680px;
+      border-left: 3px solid rgba(0,245,200,0.25);
+      padding-left: 24px;
+    }
+    .body strong {
+      color: rgba(250,250,247,0.85);
+      font-weight: 600;
+    }
+
+    /* Linha inferior */
+    .footer-line {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #00F5C8 0%, transparent 60%);
+    }
+  </style>
+</head>
+<body>
+  <div class="slide">
+    <div class="bg-gradient"></div>
+    <div class="bg-number">01</div>
+
+    <div class="header">
+      <div class="logo">MazyUI</div>
+      <div class="counter">02 / 06</div>
+    </div>
+
+    <div class="content">
+      <div class="eyebrow">
+        <span class="eyebrow-rule"></span>
+        Regra 01 — Hierarquia
+      </div>
+      <div class="numero-principal">01.</div>
+      <div class="rule"></div>
+      <h2>O olho tem uma ordem.<br>Respeite ela.</h2>
+      <p class="body">
+        Título → subtítulo → corpo → detalhe.<br>
+        Quebre essa sequência e o usuário não sabe onde olhar.<br>
+        <strong>Design sem hierarquia é caos com estética.</strong>
+      </p>
+    </div>
+
+    <div class="footer-line"></div>
+  </div>
+</body>
+</html>

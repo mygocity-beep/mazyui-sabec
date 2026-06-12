@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    html, body { margin: 0; padding: 0; background: #F5D800; }
+    .slide {
+      width: 1080px;
+      height: 1350px;
+      box-sizing: border-box;
+      font-family: 'Inter', system-ui, sans-serif;
+      position: relative;
+      overflow: hidden;
+      background: #F5D800;
+      color: #0A0A0A;
+    }
+
+    /* Textura pontilhada sutil */
+    .bg-dots {
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle, rgba(10,10,10,0.10) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    /* Círculos decorativos */
+    .circle-1 {
+      position: absolute;
+      width: 560px;
+      height: 560px;
+      border-radius: 50%;
+      border: 2px solid rgba(10,10,10,0.08);
+      top: -140px;
+      right: -140px;
+    }
+    .circle-2 {
+      position: absolute;
+      width: 360px;
+      height: 360px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(10,10,10,0.06);
+      bottom: -80px;
+      left: -80px;
+    }
+
+    /* Texto de fundo */
+    .bg-text {
+      position: absolute;
+      bottom: -40px;
+      left: -20px;
+      font-size: 280px;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -0.06em;
+      color: rgba(10,10,10,0.05);
+      user-select: none;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    /* Header */
+    .header {
+      position: absolute;
+      top: 64px;
+      left: 80px;
+      right: 80px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 2;
+    }
+    .logo {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: rgba(10,10,10,0.45);
+    }
+    .counter {
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      color: rgba(10,10,10,0.35);
+    }
+
+    /* Conteúdo CTA */
+    .content {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      left: 80px;
+      right: 80px;
+      z-index: 2;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(10,10,10,0.10);
+      border: 1.5px solid rgba(10,10,10,0.15);
+      border-radius: 100px;
+      padding: 10px 20px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.26em;
+      text-transform: uppercase;
+      color: rgba(10,10,10,0.55);
+      margin-bottom: 40px;
+    }
+
+    h1 {
+      margin: 0 0 24px 0;
+      font-size: 108px;
+      font-weight: 900;
+      line-height: 0.94;
+      letter-spacing: -0.045em;
+      color: #0A0A0A;
+    }
+
+    .rule {
+      width: 64px;
+      height: 5px;
+      background: #0A0A0A;
+      margin-bottom: 36px;
+      border-radius: 3px;
+      opacity: 0.5;
+    }
+
+    .subtitle {
+      font-size: 30px;
+      font-weight: 700;
+      line-height: 1.2;
+      color: rgba(10,10,10,0.55);
+      margin-bottom: 64px;
+      letter-spacing: -0.01em;
+    }
+
+    /* Divisor */
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: rgba(10,10,10,0.15);
+      margin-bottom: 48px;
+    }
+
+    /* Rodapé */
+    .footer-info {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand-name {
+      font-size: 38px;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      color: #0A0A0A;
+    }
+    .handle {
+      font-size: 18px;
+      font-weight: 600;
+      color: rgba(10,10,10,0.50);
+      letter-spacing: 0.04em;
+    }
+
+    /* Seta decorativa */
+    .arrow {
+      font-size: 48px;
+      font-weight: 900;
+      color: #0A0A0A;
+      line-height: 1;
+      opacity: 0.25;
+    }
+  </style>
+</head>
+<body>
+  <div class="slide">
+    <div class="bg-dots"></div>
+    <div class="circle-1"></div>
+    <div class="circle-2"></div>
+    <div class="bg-text">Design</div>
+
+    <div class="header">
+      <div class="logo">MazyUI</div>
+      <div class="counter">06 / 06</div>
+    </div>
+
+    <div class="content">
+      <div class="tag">
+        <span>CTA Final</span>
+      </div>
+
+      <h1>Bom design<br>converte.</h1>
+
+      <div class="rule"></div>
+
+      <p class="subtitle">Mediano só decora.</p>
+
+      <div class="divider"></div>
+
+      <div class="footer-info">
+        <div>
+          <div class="brand-name">MazyUI</div>
+          <div class="handle">@mazyui</div>
+        </div>
+        <div class="arrow">→</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

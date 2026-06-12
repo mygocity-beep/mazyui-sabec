@@ -1,0 +1,21 @@
+{
+  "id": 944,
+  "nome": "Dark Gradient Pricing",
+  "variante": "",
+  "autor": "vaib215",
+  "slug": "dark-gradient-pricing",
+  "descricao": "A pricing table component with a glass effect and animated cards, perfect for displaying tiered pricing plans and feature comparisons.\n\nFeatures\n- Responsive design with mobile-first approach\n- Animated glass effect with blur transitions\n- Feature comparison with checkmark indicators\n- Gradient text and background effects\n- Customizable pricing tiers and benefits\n- Motion animations on scroll",
+  "tags": [
+    "Pricing Section",
+    "Pricing Card"
+  ],
+  "downloads": 1711,
+  "salvos": 146,
+  "preview": "https://cdn.21st.dev/user_2rV0b4mwh6SKrMK7lUyQUkzEa92/dark-gradient-pricing/944/preview.png",
+  "video": "https://cdn.21st.dev/user_2rV0b4mwh6SKrMK7lUyQUkzEa92/dark-gradient-pricing/944/video.mp4",
+  "codigo": "https://cdn.21st.dev/user_2rV0b4mwh6SKrMK7lUyQUkzEa92/dark-gradient-pricing.tsx",
+  "demo": "https://cdn.21st.dev/user_2rV0b4mwh6SKrMK7lUyQUkzEa92/dark-gradient-pricing/944/code.demo.tsx",
+  "registry": "",
+  "fonte": "https://21st.dev/community/components/vaib215/dark-gradient-pricing/default",
+  "baixadoEm": "2026-06-12T13:57:02.453Z"
+}

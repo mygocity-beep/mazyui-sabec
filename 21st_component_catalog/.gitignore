@@ -1,0 +1,5 @@
+output/
+cookies*.txt
+cookies*.tsv
+*.log
+__pycache__/

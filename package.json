@@ -1,0 +1,13 @@
+{
+  "name": "sabec-os",
+  "type": "module",
+  "scripts": {
+    "dev": "node mazyui-server.mjs",
+    "start": "node mazyui-server.mjs",
+    "check": "node --check mazyui-server.mjs && node --check mazyui-ui/core/persist.js && node --check mazyui-ui/core/api.js && node --check mazyui-ui/panels/chat-stream.js && node --check mazyui-ui/panels/slide-editor.js && node --check mazyui-ui/ui/lightbox.js"
+  },
+  "devDependencies": {
+    "jimp": "^1.6.1",
+    "sharp": "^0.34.5"
+  }
+}

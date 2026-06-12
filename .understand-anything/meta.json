@@ -1,0 +1,25 @@
+{
+  "gitCommitHash": null,
+  "generatedAt": "2026-06-09T00:00:00.000Z",
+  "mode": "full",
+  "graphVersion": "1.0",
+  "tool": "mcp__agente-a-maxx__graph",
+  "phases": {
+    "F0_preflight": "ok",
+    "F1_scan": "ok — 68 arquivos relevantes",
+    "F1_5_exclusions": "ok — node_modules, binários, locks excluídos",
+    "F2_classification": "ok",
+    "F3_batching": "ok",
+    "F4_extraction": "ok — 27 arquivos lidos",
+    "F5_nodes": "ok — 47 nós",
+    "F6_edges": "ok — 48 arestas",
+    "F7_resolution": "ok — 4 ciclos identificados e documentados",
+    "F8_clustering": "ok — 10 clusters",
+    "F9_architecture": "ok — Layered Monolith + Plugin System",
+    "F10_index": "ok — 46 símbolos, 12 conceitos",
+    "F11_tour": "ok — 7 paradas",
+    "F12_qa": "ok — todos os 6 checks passando",
+    "F13_persist": "ok — KNOWLEDGE_GRAPH.md + knowledge-graph.json + meta.json",
+    "F14_incremental": "documentado no knowledge-graph.json"
+  }
+}

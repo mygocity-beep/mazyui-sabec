@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    html, body { margin: 0; padding: 0; background: #0A0A0A; }
+    .slide {
+      width: 1080px;
+      height: 1350px;
+      box-sizing: border-box;
+      font-family: 'Inter', system-ui, sans-serif;
+      position: relative;
+      overflow: hidden;
+      background: #0A0A0A;
+      color: #FAFAF7;
+    }
+
+    /* Grid de fundo sutil */
+    .bg-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(245,216,0,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(245,216,0,0.04) 1px, transparent 1px);
+      background-size: 80px 80px;
+    }
+
+    /* Círculo decorativo fundo */
+    .bg-circle {
+      position: absolute;
+      width: 700px;
+      height: 700px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(245,216,0,0.07) 0%, transparent 70%);
+      bottom: -200px;
+      right: -150px;
+    }
+
+    /* Header */
+    .header {
+      position: absolute;
+      top: 64px;
+      left: 80px;
+      right: 80px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: rgba(250,250,247,0.4);
+    }
+    .counter {
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      color: rgba(250,250,247,0.3);
+    }
+
+    /* Conteúdo principal */
+    .content {
+      position: absolute;
+      bottom: 120px;
+      left: 80px;
+      right: 80px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.30em;
+      text-transform: uppercase;
+      color: #F5D800;
+      margin-bottom: 32px;
+    }
+    .eyebrow-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #F5D800;
+      flex-shrink: 0;
+    }
+
+    .rule {
+      width: 64px;
+      height: 4px;
+      background: #F5D800;
+      margin-bottom: 36px;
+      border-radius: 2px;
+    }
+
+    h1 {
+      margin: 0 0 32px 0;
+      font-size: 100px;
+      font-weight: 900;
+      line-height: 0.96;
+      letter-spacing: -0.04em;
+      color: #FAFAF7;
+    }
+    h1 span {
+      color: #F5D800;
+    }
+
+    .subtitle {
+      font-size: 22px;
+      font-weight: 500;
+      line-height: 1.5;
+      color: rgba(250,250,247,0.55);
+      max-width: 560px;
+    }
+
+    /* Número decorativo de fundo */
+    .bg-number {
+      position: absolute;
+      top: 80px;
+      right: 60px;
+      font-size: 380px;
+      font-weight: 900;
+      letter-spacing: -0.05em;
+      color: rgba(245,216,0,0.04);
+      line-height: 1;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    /* Linha decorativa vertical */
+    .vert-line {
+      position: absolute;
+      top: 0;
+      right: 200px;
+      width: 1px;
+      height: 100%;
+      background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        rgba(245,216,0,0.12) 30%,
+        rgba(245,216,0,0.12) 70%,
+        transparent 100%
+      );
+    }
+  </style>
+</head>
+<body>
+  <div class="slide">
+    <div class="bg-grid"></div>
+    <div class="bg-circle"></div>
+    <div class="vert-line"></div>
+    <div class="bg-number">5</div>
+
+    <div class="header">
+      <div class="logo">MazyUI</div>
+      <div class="counter">01 / 06</div>
+    </div>
+
+    <div class="content">
+      <div class="eyebrow">
+        <span class="eyebrow-dot"></span>
+        Design Visual
+      </div>
+      <div class="rule"></div>
+      <h1>5 regras que o bom design<br>nunca<span> quebra.</span></h1>
+      <p class="subtitle">Princípios que separam scroll-stop de scroll-through</p>
+    </div>
+  </div>
+</body>
+</html>

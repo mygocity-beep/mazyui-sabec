@@ -1,0 +1,22 @@
+{
+  "id": 1517,
+  "nome": "FAQ Chat Accordion",
+  "variante": "",
+  "autor": "anshuman008",
+  "slug": "faq-chat-accordion",
+  "descricao": "FAQ Accordion component is a versatile and interactive UI element designed to display frequently asked questions in a collapsible format. It enhances user experience by allowing users to expand and collapse sections to view answers, making it ideal for FAQs, help sections, and more.\n\nFeatures\n- Collapsible Sections: Users can expand or collapse sections to view or hide answers.\n- Animated Transitions: Smooth animations using Framer Motion for opening and closing sections.\n- Customizable Icons: Supports custom icons for each question, with flexible positioning.\n- Theming Support: Fully integrated with shadcn/ui theming for consistent styling.\n- Responsive Design: Adapts to different screen sizes for a seamless experience.\n- Accessible: Keyboard navigation and screen reader friendly.\n- Customizable Styles: Easily customize question and answer styles with className props.\n\nExample Use Cases\n- FAQ Sections: Display frequently asked questions in a compact, user-friendly format.\n- Help Centers: Organize help topics and answers for easy navigation.\n- Product Details: Provide detailed product information in a structured manner.\n- Educational Content: Present educational material in a question-and-answer format.",
+  "tags": [
+    "Accordion",
+    "Landing Page",
+    "FAQ"
+  ],
+  "downloads": 936,
+  "salvos": 101,
+  "preview": "https://cdn.21st.dev/user_anshuman008/faq-chat-accordion/default/preview.1738396633421.png",
+  "video": "https://cdn.21st.dev/user_anshuman008/faq-chat-accordion/default/video.1738396635005.mp4",
+  "codigo": "https://cdn.21st.dev/user_anshuman008/faq-chat-accordion.tsx",
+  "demo": "https://cdn.21st.dev/user_anshuman008/faq-chat-accordion/default/code.demo.tsx",
+  "registry": "",
+  "fonte": "https://21st.dev/community/components/anshuman008/faq-chat-accordion/default",
+  "baixadoEm": "2026-06-12T13:56:52.776Z"
+}

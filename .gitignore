@@ -1,0 +1,33 @@
+# Dependências
+node_modules/
+.mazyui-runtime/
+
+# Uploads de usuário (gerados em runtime)
+uploads/
+
+# Snapshots temporários de slides (gerados em runtime)
+.mazyui-runtime/slide-snapshots/
+
+# Conteúdo de marketing gerado (PNGs pesados — opcional manter HTMLs)
+marketing/conteudo/**/*.png
+marketing/conteudo/**/*.jpg
+marketing/conteudo/**/*.webp
+
+# Saídas e relatórios temporários
+saidas/*.json
+
+# OS / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+.vscode/settings.json
+
+# Logs
+*.log
+npm-debug.log*
+
+# Env local (caso venha a usar)
+.env
+.env.local

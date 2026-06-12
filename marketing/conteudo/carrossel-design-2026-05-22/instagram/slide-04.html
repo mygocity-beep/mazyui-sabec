@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    html, body { margin: 0; padding: 0; background: #1C0A3D; }
+    .slide {
+      width: 1080px;
+      height: 1350px;
+      box-sizing: border-box;
+      font-family: 'Inter', system-ui, sans-serif;
+      position: relative;
+      overflow: hidden;
+      background: #1C0A3D;
+      color: #FAFAF7;
+    }
+
+    /* Gradiente de fundo */
+    .bg-gradient {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 100% 0%, rgba(168,85,247,0.20) 0%, transparent 55%),
+        radial-gradient(ellipse at 0% 100%, rgba(99,30,180,0.25) 0%, transparent 50%);
+    }
+
+    /* Linhas diagonais decorativas */
+    .bg-lines {
+      position: absolute;
+      inset: 0;
+      background-image: repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 60px,
+        rgba(168,85,247,0.03) 60px,
+        rgba(168,85,247,0.03) 61px
+      );
+    }
+
+    /* Header */
+    .header {
+      position: absolute;
+      top: 64px;
+      left: 80px;
+      right: 80px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 2;
+    }
+    .logo {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: rgba(250,250,247,0.30);
+    }
+    .counter {
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      color: rgba(250,250,247,0.25);
+    }
+
+    /* Layout SOLO — texto centrado com espaços generosos */
+    .content {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-52%);
+      left: 80px;
+      right: 80px;
+      z-index: 2;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: #C084FC;
+      margin-bottom: 44px;
+    }
+    .eyebrow-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #C084FC;
+    }
+
+    .rule {
+      width: 64px;
+      height: 4px;
+      background: #C084FC;
+      margin-bottom: 44px;
+      border-radius: 2px;
+    }
+
+    h2 {
+      margin: 0 0 48px 0;
+      font-size: 80px;
+      font-weight: 900;
+      line-height: 0.98;
+      letter-spacing: -0.04em;
+      color: #FAFAF7;
+    }
+    h2 em {
+      font-style: normal;
+      color: #C084FC;
+    }
+
+    /* Espaço visual como demonstração */
+    .space-demo {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 56px;
+      align-items: stretch;
+    }
+    .space-card {
+      flex: 1;
+      border-radius: 12px;
+      padding: 28px;
+      position: relative;
+    }
+    .space-card-crowded {
+      background: rgba(168,85,247,0.08);
+      border: 1px solid rgba(168,85,247,0.15);
+    }
+    .space-card-open {
+      background: rgba(168,85,247,0.15);
+      border: 1px solid rgba(192,132,252,0.30);
+    }
+    .card-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .space-card-crowded .card-label { color: rgba(250,250,247,0.35); }
+    .space-card-open .card-label { color: #C084FC; }
+
+    .crowded-blocks {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .block { border-radius: 4px; }
+    .block-title { height: 14px; background: rgba(250,250,247,0.25); width: 80%; }
+    .block-sub   { height: 10px; background: rgba(250,250,247,0.15); width: 100%; }
+    .block-body  { height: 9px;  background: rgba(250,250,247,0.10); width: 90%; }
+    .block-body2 { height: 9px;  background: rgba(250,250,247,0.10); width: 70%; }
+    .block-btn   { height: 28px; background: rgba(250,250,247,0.15); width: 50%; border-radius: 4px; margin-top: 4px; }
+
+    .open-blocks {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .block-title-open { height: 16px; background: rgba(192,132,252,0.55); width: 75%; border-radius: 3px; }
+    .block-sub-open   { height: 11px; background: rgba(250,250,247,0.25); width: 90%; border-radius: 3px; }
+    .block-btn-open   { height: 32px; background: rgba(192,132,252,0.35); width: 45%; border-radius: 6px; margin-top: 8px; }
+
+    .body {
+      font-size: 21px;
+      font-weight: 400;
+      line-height: 1.6;
+      color: rgba(250,250,247,0.58);
+    }
+    .body strong {
+      font-weight: 700;
+      color: rgba(250,250,247,0.85);
+    }
+
+    /* Bordas laterais decorativas */
+    .side-accent {
+      position: absolute;
+      top: 15%;
+      left: 0;
+      width: 4px;
+      height: 70%;
+      background: linear-gradient(to bottom, transparent, #C084FC, transparent);
+    }
+  </style>
+</head>
+<body>
+  <div class="slide">
+    <div class="bg-gradient"></div>
+    <div class="bg-lines"></div>
+    <div class="side-accent"></div>
+
+    <div class="header">
+      <div class="logo">MazyUI</div>
+      <div class="counter">04 / 06</div>
+    </div>
+
+    <div class="content">
+      <div class="eyebrow">
+        <span class="eyebrow-dot"></span>
+        Regra 03 — Espaço
+      </div>
+      <div class="rule"></div>
+      <h2>O branco não é<br>vazio. É <em>respiração.</em></h2>
+
+      <div class="space-demo">
+        <div class="space-card space-card-crowded">
+          <div class="card-label">Sem espaço</div>
+          <div class="crowded-blocks">
+            <div class="block block-title"></div>
+            <div class="block block-sub"></div>
+            <div class="block block-body"></div>
+            <div class="block block-body2"></div>
+            <div class="block block-btn"></div>
+          </div>
+        </div>
+        <div class="space-card space-card-open">
+          <div class="card-label">Com espaço</div>
+          <div class="open-blocks">
+            <div class="block-title-open"></div>
+            <div class="block-sub-open"></div>
+            <div class="block-btn-open"></div>
+          </div>
+        </div>
+      </div>
+
+      <p class="body">
+        Espaço em branco dá peso ao que fica.
+        <strong>Premium é quando o design tem espaço pra respirar.</strong>
+      </p>
+    </div>
+  </div>
+</body>
+</html>

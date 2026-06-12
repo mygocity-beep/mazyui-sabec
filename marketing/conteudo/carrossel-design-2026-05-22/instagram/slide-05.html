@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    html, body { margin: 0; padding: 0; background: #0A0A0A; }
+    .slide {
+      width: 1080px;
+      height: 1350px;
+      box-sizing: border-box;
+      font-family: 'Inter', system-ui, sans-serif;
+      position: relative;
+      overflow: hidden;
+      background: #0A0A0A;
+      color: #FAFAF7;
+    }
+
+    /* Header */
+    .header {
+      position: absolute;
+      top: 64px;
+      left: 80px;
+      right: 80px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 2;
+    }
+    .logo {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: rgba(250,250,247,0.30);
+    }
+    .counter {
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      color: rgba(250,250,247,0.25);
+    }
+
+    /* Layout DUO — split vertical 50/50 */
+    .split {
+      position: absolute;
+      inset: 0;
+      display: flex;
+    }
+
+    /* Painel esquerdo — laranja */
+    .panel-left {
+      flex: 1;
+      background: #FF6B35;
+      padding: 180px 60px 80px 80px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      position: relative;
+    }
+    .panel-left .panel-eyebrow {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.30em;
+      text-transform: uppercase;
+      color: rgba(10,10,10,0.55);
+      margin-bottom: 16px;
+    }
+    .panel-left h3 {
+      margin: 0 0 20px 0;
+      font-size: 52px;
+      font-weight: 900;
+      line-height: 0.98;
+      letter-spacing: -0.03em;
+      color: #0A0A0A;
+    }
+    .panel-left p {
+      font-size: 19px;
+      font-weight: 500;
+      line-height: 1.5;
+      color: rgba(10,10,10,0.65);
+    }
+
+    /* Círculo decorativo no painel laranja */
+    .orange-circle {
+      position: absolute;
+      top: -100px;
+      right: -100px;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      background: rgba(10,10,10,0.08);
+    }
+    .orange-circle-2 {
+      position: absolute;
+      bottom: 60px;
+      left: -60px;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      border: 2px solid rgba(10,10,10,0.12);
+    }
+
+    /* Painel direito — escuro */
+    .panel-right {
+      flex: 1;
+      background: #111111;
+      padding: 180px 80px 80px 60px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      position: relative;
+    }
+    .panel-right .panel-eyebrow {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.30em;
+      text-transform: uppercase;
+      color: rgba(250,250,247,0.35);
+      margin-bottom: 16px;
+    }
+    .panel-right h3 {
+      margin: 0 0 20px 0;
+      font-size: 52px;
+      font-weight: 900;
+      line-height: 0.98;
+      letter-spacing: -0.03em;
+      color: #FAFAF7;
+    }
+    .panel-right p {
+      font-size: 19px;
+      font-weight: 400;
+      line-height: 1.5;
+      color: rgba(250,250,247,0.50);
+    }
+
+    /* Topo do painel direito: paleta de cores */
+    .palette {
+      position: absolute;
+      top: 130px;
+      left: 60px;
+      right: 80px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .swatch {
+      border-radius: 8px;
+      flex-shrink: 0;
+    }
+
+    /* Div central de sobreposição */
+    .center-rule {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 4px;
+      height: 100%;
+      background: #0A0A0A;
+      z-index: 3;
+    }
+
+    /* Header superior — cobre os dois painéis */
+    .top-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 148px;
+      z-index: 4;
+      display: flex;
+      align-items: flex-start;
+      padding: 64px 80px 0;
+      justify-content: space-between;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.60) 0%, transparent 100%);
+    }
+
+    /* Linha central com título */
+    .center-title {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-90deg);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: rgba(250,250,247,0.25);
+      white-space: nowrap;
+      z-index: 5;
+    }
+
+    /* Eyebrow geral no topo dos dois painéis */
+    .global-eyebrow {
+      position: absolute;
+      top: 140px;
+      left: 80px;
+      right: 80px;
+      z-index: 4;
+    }
+    .global-eyebrow-inner {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.30em;
+      text-transform: uppercase;
+      color: #FF6B35;
+    }
+    .eyebrow-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #FF6B35;
+    }
+  </style>
+</head>
+<body>
+  <div class="slide">
+
+    <div class="split">
+      <!-- Painel esquerdo -->
+      <div class="panel-left">
+        <div class="orange-circle"></div>
+        <div class="orange-circle-2"></div>
+        <!-- Demonstração de cor de destaque -->
+        <div style="display:flex; gap:10px; margin-bottom:32px;">
+          <div style="width:54px;height:54px;border-radius:8px;background:#FF6B35;"></div>
+          <div style="width:54px;height:54px;border-radius:8px;background:#1A1A1A;"></div>
+          <div style="width:54px;height:54px;border-radius:8px;background:#F5F5F0;"></div>
+        </div>
+        <div class="panel-eyebrow">Uma cor</div>
+        <h3>Uma cor<br>com intenção</h3>
+        <p>Foco, ação, emoção.<br>A cor carrega peso.</p>
+      </div>
+
+      <!-- Painel direito -->
+      <div class="panel-right">
+        <!-- Paleta caótica de demonstração -->
+        <div style="display:flex; gap:8px; margin-bottom:32px; flex-wrap:wrap;">
+          <div style="width:40px;height:40px;border-radius:6px;background:#FF4545;"></div>
+          <div style="width:40px;height:40px;border-radius:6px;background:#00F5C8;"></div>
+          <div style="width:40px;height:40px;border-radius:6px;background:#C084FC;"></div>
+          <div style="width:40px;height:40px;border-radius:6px;background:#F5D800;"></div>
+          <div style="width:40px;height:40px;border-radius:6px;background:#FF6B35;"></div>
+          <div style="width:36px;height:36px;border-radius:6px;background:#4DAFFF;opacity:0.5;"></div>
+          <div style="width:36px;height:36px;border-radius:6px;background:#FF87C3;opacity:0.5;"></div>
+        </div>
+        <div class="panel-eyebrow">Cinco cores</div>
+        <h3>Cinco cores<br>brigando</h3>
+        <p>Nenhuma vence.<br>O olho se perde.</p>
+      </div>
+    </div>
+
+    <!-- Divisor central -->
+    <div class="center-rule"></div>
+    <div class="center-title">Regra 04 — Cor</div>
+
+    <!-- Header superior -->
+    <div class="top-overlay">
+      <div class="logo" style="font-size:16px;font-weight:700;letter-spacing:0.28em;text-transform:uppercase;color:rgba(250,250,247,0.40);">MazyUI</div>
+      <div class="counter" style="font-size:14px;font-weight:500;letter-spacing:0.18em;color:rgba(250,250,247,0.30);">05 / 06</div>
+    </div>
+
+    <!-- Eyebrow global -->
+    <div class="global-eyebrow">
+      <div class="global-eyebrow-inner">
+        <span class="eyebrow-dot"></span>
+        Uma cor de destaque. Não cinco.
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>
