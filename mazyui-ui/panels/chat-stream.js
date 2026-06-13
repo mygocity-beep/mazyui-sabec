@@ -260,11 +260,53 @@ function finishTurn(turn) {
 }
 
 // ---------------------------------------------------------------------------
+// Rate-limit (429) helpers
+// ---------------------------------------------------------------------------
+
+function is429Error(text) {
+  if (typeof text !== 'string') return false;
+  return text.includes('429') &&
+    (text.includes('rate limit') || text.includes('Rate limit') ||
+     text.includes('rate_limit') || text.includes('Request rejected'));
+}
+
+function showCountdown(logEl, totalSecs) {
+  return new Promise(resolve => {
+    const el = document.createElement('div');
+    el.className = 'run-event system';
+    el.innerHTML = `
+      <div class="ev-ico">⏱</div>
+      <div class="ev-body">
+        <div class="ev-title">Limite de taxa — aguardando</div>
+        <div class="ev-detail ev-countdown">Retentando em <strong>${totalSecs}s</strong>…</div>
+      </div>`;
+    logEl.appendChild(el);
+    scrollChatToBottom();
+
+    let rem = totalSecs;
+    const ticker = setInterval(() => {
+      rem--;
+      const d = el.querySelector('.ev-countdown');
+      if (!d) { clearInterval(ticker); resolve(el); return; }
+      if (rem <= 0) {
+        d.innerHTML = 'Retentando agora…';
+        clearInterval(ticker);
+        resolve(el);
+      } else {
+        d.innerHTML = `Retentando em <strong>${rem}s</strong>…`;
+      }
+    }, 1000);
+  });
+}
+
+// ---------------------------------------------------------------------------
 // Public: startChatRun
 // ---------------------------------------------------------------------------
 
 export async function startChatRun(turn, prompt) {
-  const runId = newId('run');
+  const MAX_RATE_RETRIES = 1; // 1 retry automático; se persistir, mostra erro limpo
+
+  // Configuração de engine/sessão — feita só na primeira tentativa
   const selectedModel = modelConfig(state.chat.model);
   const engine = selectedModel.engine || 'claude';
   if (state.chat.cliSessionEngine && state.chat.cliSessionEngine !== engine) {
@@ -276,55 +318,97 @@ export async function startChatRun(turn, prompt) {
     state.chat.cliSessionId = crypto.randomUUID();
     state.chat.cliSessionEstablished = false;
   }
-  const sessionEstablishedAtStart = state.chat.cliSessionEstablished;
-  state.currentRun = { runId, turn, startedAt: Date.now() };
-  startHeartbeat();
 
-  let exitCode = null;
-  let resultData = null;
+  for (let attempt = 0; attempt <= MAX_RATE_RETRIES; attempt++) {
+    const runId = newId('run');
+    const sessionEstablishedAtStart = state.chat.cliSessionEstablished;
+    state.currentRun = { runId, turn, startedAt: Date.now() };
+    if (attempt === 0) startHeartbeat();
 
-  try {
-    await streamRun(prompt, runId, evt => {
-      if (evt.event === 'event') {
-        try {
-          const obj = JSON.parse(evt.data);
-          handleStreamEvent(obj, turn);
-          if (obj.type === 'result') resultData = obj;
-        } catch { /* JSON parse fail — skip */ }
-      } else if (evt.event === 'stderr') {
-        appendEventToTurn(turn, { kind: 'error', ico: '!', title: 'Aviso', detail: evt.data });
-      } else if (evt.event === 'done') {
-        try { exitCode = JSON.parse(evt.data).exitCode; } catch {}
-      }
-    }, {
-      sessionId: engine === 'claude' && !sessionEstablishedAtStart ? state.chat.cliSessionId : null,
-      resumeSession: sessionEstablishedAtStart ? state.chat.cliSessionId : null,
-      model: selectedModel.cliModel,
-      engine,
-    });
-  } catch (e) {
-    appendEventToTurn(turn, { kind: 'error', ico: '!', title: 'Conexão caiu', detail: e.message || '' });
-    turn.status = 'error';
+    let rateLimited = false;
+    let exitCode = null;
+    let resultData = null;
+
+    try {
+      await streamRun(prompt, runId, evt => {
+        if (evt.event === 'event') {
+          try {
+            const obj = JSON.parse(evt.data);
+            // Intercept 429 em mensagens de texto — suprime o erro bruto
+            if (obj.type === 'assistant' && obj.message?.content) {
+              const has429 = obj.message.content.some(
+                p => p.type === 'text' && is429Error(p.text || '')
+              );
+              if (has429) {
+                rateLimited = true;
+                const clean = obj.message.content.filter(
+                  p => !(p.type === 'text' && is429Error(p.text || ''))
+                );
+                if (clean.length > 0) {
+                  handleStreamEvent({ ...obj, message: { ...obj.message, content: clean } }, turn);
+                }
+                return;
+              }
+            }
+            handleStreamEvent(obj, turn);
+            if (obj.type === 'result') resultData = obj;
+          } catch { /* JSON parse fail — skip */ }
+        } else if (evt.event === 'stderr') {
+          if (is429Error(evt.data)) { rateLimited = true; return; }
+          appendEventToTurn(turn, { kind: 'error', ico: '!', title: 'Aviso', detail: evt.data });
+        } else if (evt.event === 'done') {
+          try { exitCode = JSON.parse(evt.data).exitCode; } catch {}
+        }
+      }, {
+        sessionId: engine === 'claude' && !sessionEstablishedAtStart ? state.chat.cliSessionId : null,
+        resumeSession: sessionEstablishedAtStart ? state.chat.cliSessionId : null,
+        model: selectedModel.cliModel,
+        engine,
+      });
+    } catch (e) {
+      appendEventToTurn(turn, { kind: 'error', ico: '!', title: 'Conexão caiu', detail: e.message || '' });
+      turn.status = 'error';
+      finishTurn(turn);
+      return;
+    }
+
+    // 429 detectado e ainda há retry disponível → countdown + retry
+    if (rateLimited && attempt < MAX_RATE_RETRIES) {
+      stopHeartbeat();
+      const logEl = document.getElementById('log-' + turn.id);
+      if (logEl) await showCountdown(logEl, 60);
+      startHeartbeat();
+      continue;
+    }
+
+    // 429 persistente (esgotou retries) → mensagem limpa orientando o usuário
+    if (rateLimited) {
+      appendEventToTurn(turn, {
+        kind: 'error',
+        ico: '!',
+        title: 'Limite de taxa persistente',
+        detail: 'Inicie uma nova conversa para reduzir o contexto, ou aguarde alguns minutos antes de tentar novamente.',
+      });
+      turn.status = 'error';
+    } else if (exitCode === 0 || resultData?.subtype === 'success') {
+      turn.status = 'done';
+      state.chat.cliSessionEstablished = !!state.chat.cliSessionId;
+    } else if (exitCode === null) {
+      turn.status = 'done';
+    } else {
+      turn.status = 'error';
+    }
+
+    if (resultData) {
+      turn.meta = {
+        duration_ms: resultData.duration_ms,
+        total_cost_usd: resultData.total_cost_usd,
+        num_turns: resultData.num_turns,
+      };
+    }
     finishTurn(turn);
     return;
   }
-
-  if (exitCode === 0 || resultData?.subtype === 'success') {
-    turn.status = 'done';
-    state.chat.cliSessionEstablished = !!state.chat.cliSessionId;
-  } else if (exitCode === null) {
-    turn.status = 'done';
-  } else {
-    turn.status = 'error';
-  }
-  if (resultData) {
-    turn.meta = {
-      duration_ms: resultData.duration_ms,
-      total_cost_usd: resultData.total_cost_usd,
-      num_turns: resultData.num_turns,
-    };
-  }
-  finishTurn(turn);
 }
 
 // ---------------------------------------------------------------------------
