@@ -8,14 +8,6 @@ uploads/
 # Snapshots temporários de slides (gerados em runtime)
 .mazyui-runtime/slide-snapshots/
 
-# Conteúdo de marketing gerado (PNGs pesados — opcional manter HTMLs)
-marketing/conteudo/**/*.png
-marketing/conteudo/**/*.jpg
-marketing/conteudo/**/*.webp
-
-# Saídas e relatórios temporários
-saidas/*.json
-
 # OS / editor
 .DS_Store
 Thumbs.db
@@ -31,3 +23,20 @@ npm-debug.log*
 # Env local (caso venha a usar)
 .env
 .env.local
+
+# -------------------------------------------------------
+# Conteúdo pessoal e projetos — NÃO subir no GitHub
+# Só atualizar sistema/código; criações são pessoais.
+# -------------------------------------------------------
+_memoria/
+identidade/
+marketing/
+clientes/
+dados/
+saidas/
+REFERENCIAS/
+pacientes/
+brand.config.js
+local-routes.mjs
+local-ui.js
+local-ui.css
