@@ -38,7 +38,7 @@ export const MODEL_DEFAULT          = 'claude-sonnet-4-6';
 
 export const MODELS = [
   { id: 'codex-default',              engine: 'codex',  cliModel: null,                          name: 'Codex',      desc: 'OpenAI Codex · usa o modelo configurado no Codex CLI' },
-  { id: 'claude-opus-4-7',           engine: 'claude', cliModel: 'claude-opus-4-7',             name: 'Opus 4.7',   desc: 'Claude Code · raciocínio pesado e criação visual' },
+  { id: 'claude-opus-4-8',           engine: 'claude', cliModel: 'claude-opus-4-8',             name: 'Opus 4.8',   desc: 'Claude Code · raciocínio pesado e criação visual' },
   { id: 'claude-sonnet-4-6',         engine: 'claude', cliModel: 'claude-sonnet-4-6',           name: 'Sonnet 4.6', desc: 'Claude Code · equilíbrio pro dia a dia' },
   { id: 'claude-haiku-4-5-20251001', engine: 'claude', cliModel: 'claude-haiku-4-5-20251001', name: 'Haiku 4.5',  desc: 'Claude Code · rápido para tarefas curtas' },
 ];

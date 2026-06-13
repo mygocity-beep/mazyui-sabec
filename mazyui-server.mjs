@@ -664,101 +664,6 @@ async function handleRun(req, res) {
   });
 }
 
-async function handleRunClaudeLegacy(req, res) {
-  let body;
-  try { body = JSON.parse(await readBody(req)); }
-  catch { return json(res, 400, { error: 'JSON inválido' }); }
-  const { prompt, runId, continueSession, model, sessionId, resumeSession } = body;
-  if (!prompt || !runId) return json(res, 400, { error: 'prompt e runId obrigatórios' });
-
-  // Valida UUID v4-ish (aceita qualquer UUID canônico 8-4-4-4-12 hex). Inválido vira null.
-  const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-  const safeSessionId = (typeof sessionId === 'string' && UUID_RE.test(sessionId)) ? sessionId : null;
-  const safeResume = (typeof resumeSession === 'string' && UUID_RE.test(resumeSession)) ? resumeSession : null;
-
-  if (!CLAUDE_ENTRY) {
-    try { CLAUDE_ENTRY = await ensureClaudeCode(); }
-    catch (e) { return json(res, 500, { error: 'Setup falhou: ' + e.message }); }
-  }
-
-  // SSE
-  res.writeHead(200, {
-    'Content-Type': 'text/event-stream; charset=utf-8',
-    'Cache-Control': 'no-store',
-    'Connection': 'keep-alive',
-    'X-Accel-Buffering': 'no',
-  });
-  const send = (event, data) => {
-    if (event) res.write(`event: ${event}\n`);
-    res.write(`data: ${typeof data === 'string' ? data : JSON.stringify(data)}\n\n`);
-  };
-
-  send('boot', { ok: true });
-
-  const args = [
-    '-p', prompt,
-    '--output-format', 'stream-json',
-    '--verbose',
-    '--permission-mode', 'bypassPermissions',
-  ];
-  // Isolamento de sessões: cada thread de conversa (chat ou slide-edit) tem
-  // um UUID próprio. --resume continua a thread, --session-id força um id
-  // fresco. Sem nenhum dos dois, cai pra --continue (legacy / sem id).
-  // resumeSession tem precedência: continuar uma thread existente.
-  if (safeResume) {
-    args.push('--resume', safeResume);
-  } else if (safeSessionId) {
-    args.push('--session-id', safeSessionId);
-  } else if (continueSession) {
-    args.push('--continue');
-  }
-  if (model && /^[a-z0-9._-]+$/i.test(model)) args.push('--model', model);
-  // Sem shell — shell:true no Windows reconstrói o comando via cmd.exe e
-  // quebra args com newline. Spawnar o entry direto (seja .exe nativo ou
-  // arquivo JS) preserva os args como estão.
-  const isExe = /\.exe$/i.test(CLAUDE_ENTRY);
-  const cmd = isExe ? CLAUDE_ENTRY : process.execPath;
-  const finalArgs = isExe ? args : [CLAUDE_ENTRY, ...args];
-  const proc = spawn(cmd, finalArgs, {
-    cwd: ROOT,
-    env: { ...process.env },
-    stdio: ['ignore', 'pipe', 'pipe'],
-    windowsHide: true,
-  });
-  activeRuns.set(runId, proc);
-
-  let stdoutBuf = '';
-  proc.stdout.on('data', chunk => {
-    stdoutBuf += chunk.toString('utf8');
-    let nl;
-    while ((nl = stdoutBuf.indexOf('\n')) !== -1) {
-      const line = stdoutBuf.slice(0, nl).trim();
-      stdoutBuf = stdoutBuf.slice(nl + 1);
-      if (line) send('event', line);
-    }
-  });
-  proc.stderr.on('data', chunk => {
-    send('stderr', chunk.toString('utf8'));
-  });
-  proc.on('close', code => {
-    if (stdoutBuf.trim()) send('event', stdoutBuf.trim());
-    send('done', { exitCode: code });
-    res.end();
-    activeRuns.delete(runId);
-  });
-  proc.on('error', err => {
-    send('stderr', 'Erro spawning Claude: ' + err.message);
-    send('done', { exitCode: -1 });
-    res.end();
-    activeRuns.delete(runId);
-  });
-
-  req.on('close', () => {
-    if (!proc.killed) proc.kill();
-    activeRuns.delete(runId);
-  });
-}
-
 async function handleCancel(req, res) {
   try {
     const { runId } = JSON.parse(await readBody(req));
@@ -1359,7 +1264,38 @@ async function loadLocalRoutes() {
 // ============================================================
 // Server
 // ============================================================
+// ── Guarda anti-CSRF / anti-DNS-rebinding ─────────────────────────────────
+// O servidor escuta só em 127.0.0.1, mas isso não impede que uma página web
+// aberta no navegador do usuário dispare requests pra localhost:7777 (CSRF)
+// nem um domínio que resolve pra 127.0.0.1 (DNS rebinding). Como /api/run
+// executa o agente com bypassPermissions, qualquer request forjado vira RCE.
+//
+// Defesa: aceitar só requests cujo Host seja localhost/127.0.0.1 (mata o
+// rebinding) e cujo Origin, quando presente, seja o próprio painel (mata o
+// CSRF — o navegador sempre carimba Origin em fetch cross-origin, e a página
+// atacante não consegue omiti-lo). Navegação direta e health-check não mandam
+// Origin → passam normalmente.
+const ALLOWED_HOSTS = new Set([
+  `localhost:${PORT}`, `127.0.0.1:${PORT}`,
+  'localhost', '127.0.0.1',
+]);
+
+function originAllowed(req) {
+  const host = String(req.headers.host || '').toLowerCase();
+  if (host && !ALLOWED_HOSTS.has(host)) return false;
+  const origin = req.headers.origin;
+  if (origin) {
+    try {
+      if (!ALLOWED_HOSTS.has(new URL(origin).host.toLowerCase())) return false;
+    } catch { return false; }
+  }
+  return true;
+}
+
 const server = http.createServer(async (req, res) => {
+  if (!originAllowed(req)) {
+    return text(res, 403, '403 Forbidden — origem não autorizada');
+  }
   const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
   const p = url.pathname;
   const method = req.method;
