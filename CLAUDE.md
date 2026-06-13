@@ -323,6 +323,26 @@ carga de cada um. Prefixo `_` na pasta desativa o módulo. Dados do
 módulo vão em `dados/<id>/`. A regra inviolável do topo continua
 valendo: nada de feature de cliente em `mazyui-*`.
 
+## Integração Codex no chat (mudança de sistema — pendente de port)
+
+O chat do painel suporta duas engines: **Claude Code** (default) e
+**Codex CLI** (OpenAI), selecionáveis no dropdown de modelo. Detalhes:
+
+- Servidor: `buildCodexRun()` + `normalizeCodexEvent()` em
+  `mazyui-server.mjs` traduzem o JSONL do `codex exec --json` pro
+  formato de eventos que a UI já entende. Modelo default do Codex é
+  lido de `~/.codex/config.toml` (`codexDefaultModel()`).
+- UI: `MODELS` em `mazyui-ui/core/persist.js` tem campo `engine`;
+  default do chat é `MODEL_DEFAULT = 'claude-sonnet-4-6'`.
+
+⚠️ **Pendência:** tudo isso vive em arquivos de sistema (`mazyui-server.mjs`,
+`mazyui-ui/`). Precisa ser **portado pro repo central `sabec-os`** — o
+`/atualizar-sistema` sobrescreve esses arquivos e a integração some se
+não for portada. O mesmo vale pros fixes de `&t=` no cache-buster do
+logo (`panels/identidade.js`, `ui/lightbox.js`) e pro mapeamento de
+cores do `brand.js` (design-guide escuro × UI clara — contornado via
+`local-ui.css` neste cliente).
+
 ## Catálogo de componentes (extensão deste cliente)
 
 Pacote de capacidade de design: 3.915 componentes web do 21st.dev,

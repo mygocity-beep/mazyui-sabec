@@ -101,6 +101,24 @@ function resolveCodexEntry() {
   return fs.existsSync(npmEntry) ? npmEntry : null;
 }
 
+// Modelo default do Codex (~/.codex/config.toml, chave top-level `model`).
+// Os eventos JSONL do codex exec 0.115 não reportam o modelo, então essa é
+// a única fonte quando a run não passa --model. Cache em módulo: o config
+// só muda com restart do servidor de qualquer forma.
+let _codexDefaultModel; // undefined = ainda não lido; null = sem chave
+function codexDefaultModel() {
+  if (_codexDefaultModel !== undefined) return _codexDefaultModel;
+  _codexDefaultModel = null;
+  try {
+    const home = process.env.USERPROFILE || process.env.HOME || '';
+    const raw = fs.readFileSync(path.join(home, '.codex', 'config.toml'), 'utf8');
+    const topLevel = raw.split(/^\[/m)[0]; // ignora chaves de [profiles.*] etc.
+    const m = topLevel.match(/^\s*model\s*=\s*"([^"]+)"/m);
+    if (m) _codexDefaultModel = m[1];
+  } catch { /* sem config → null */ }
+  return _codexDefaultModel;
+}
+
 function ensureCodex() {
   const entry = resolveCodexEntry();
   if (!entry) {
@@ -489,7 +507,7 @@ function normalizeCodexEvent(obj, ctx) {
       type: 'system',
       subtype: 'init',
       engine: 'codex',
-      model: ctx.model || 'config padrão',
+      model: ctx.model || codexDefaultModel() || 'padrão do Codex',
       session_id: ctx.sessionId,
     } }];
   }
@@ -624,6 +642,7 @@ async function handleRun(req, res) {
     for (const line of text.split(/\r?\n/)) {
       if (!line.trim()) continue;
       if (/^\d{4}-\d{2}-\d{2}T\S+\s+(?:WARN|INFO|DEBUG)\s+codex_/i.test(line)) continue;
+      if (/^Reading additional input from stdin/i.test(line)) continue;
       send('stderr', line);
     }
   });
@@ -761,29 +780,31 @@ function handleShutdown(req, res) {
 }
 
 function handleRestart(req, res) {
-  // Dispara um cmd/sh em background que aguarda 2s (tempo do processo atual
-  // sair + liberar a porta) e então sobe um novo `node mazyui-server.mjs`.
-  // Em seguida mata o processo atual.
+  // Relançador em Node puro: um processo node desanexado espera o atual
+  // sair (+ liberar a porta) e sobe um `node mazyui-server.mjs` novo,
+  // também desanexado. Sem cmd.exe/sh no meio — a versão anterior usava
+  // `start "" /min cmd /c "...\"...\""` e o escape de aspas do cmd
+  // quebrava o relançamento silenciosamente (server nunca voltava).
   try {
     const serverFile = path.join(ROOT, 'mazyui-server.mjs');
-    if (IS_WIN) {
-      // `start "" /min cmd /c ...` desanexa de vez do processo pai.
-      // Aspas dentro de cmd /c "..." exigem \\" pra não fechar a string prematuramente
-      // quando o path contém espaços.
-      const q = (s) => `\\"${s}\\"`;
-      const cmdLine = `start "" /min cmd /c "timeout /t 2 /nobreak >nul & cd /d ${q(ROOT)} & node ${q(serverFile)}"`;
-      spawn('cmd.exe', ['/c', cmdLine], {
-        detached: true,
-        stdio: 'ignore',
-        windowsHide: true,
-      }).unref();
-    } else {
-      const shellCmd = `sleep 2 && cd "${ROOT}" && node "${serverFile}"`;
-      spawn('sh', ['-c', shellCmd], {
-        detached: true,
-        stdio: 'ignore',
-      }).unref();
-    }
+    const relauncher = path.join(RUNTIME_DIR, 'relaunch.mjs');
+    fs.mkdirSync(RUNTIME_DIR, { recursive: true });
+    fs.writeFileSync(relauncher, [
+      "import { spawn } from 'node:child_process';",
+      'const [root, server] = process.argv.slice(2);',
+      'setTimeout(() => {',
+      '  spawn(process.execPath, [server], {',
+      "    cwd: root, detached: true, stdio: 'ignore', windowsHide: true,",
+      '  }).unref();',
+      '  process.exit(0);',
+      '}, 2500);',
+      '',
+    ].join('\n'));
+    spawn(process.execPath, [relauncher, ROOT, serverFile], {
+      detached: true,
+      stdio: 'ignore',
+      windowsHide: true,
+    }).unref();
     json(res, 200, { ok: true });
     setTimeout(() => process.exit(0), 200);
   } catch (e) {
@@ -1359,8 +1380,20 @@ const server = http.createServer(async (req, res) => {
 
 await loadLocalRoutes();
 
+// No restart pelo painel, o processo velho pode demorar mais que os 2s do
+// relançador pra liberar a porta — re-tenta antes de desistir, senão o
+// restart morre silenciosamente com EADDRINUSE.
+let listenTentativas = 0;
+const LISTEN_MAX_TENTATIVAS = 12; // ~6s de janela
+
 server.on('error', (e) => {
   if (e && e.code === 'EADDRINUSE') {
+    listenTentativas++;
+    if (listenTentativas < LISTEN_MAX_TENTATIVAS) {
+      console.error(`[mazyui] Porta ${PORT} ainda em uso — tentativa ${listenTentativas}/${LISTEN_MAX_TENTATIVAS - 1}, aguardando 500ms…`);
+      setTimeout(() => server.listen(PORT, '127.0.0.1'), 500);
+      return;
+    }
     console.error(`[mazyui] A porta ${PORT} ja esta em uso.`);
     console.error(`[mazyui] Se o painel ja estiver aberto, acesse: http://localhost:${PORT}`);
     console.error('[mazyui] Para reiniciar do zero, feche a instancia atual pelo painel ou encerre o processo dessa porta.');
@@ -1369,10 +1402,12 @@ server.on('error', (e) => {
   throw e;
 });
 
-server.listen(PORT, '127.0.0.1', () => {
+server.on('listening', () => {
   console.log(`\n  ${brand.consoleLabel}`);
   console.log(`  → http://localhost:${PORT}\n`);
 });
+
+server.listen(PORT, '127.0.0.1');
 
 process.on('SIGINT', () => {
   for (const proc of activeRuns.values()) {

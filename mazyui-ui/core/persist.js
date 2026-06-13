@@ -34,6 +34,7 @@ export const CONSENT_KEY       = 'sabec:consented:v1';
 export const CHAT_HISTORY_MAX_TURNS = 60;
 export const CHAT_SESSIONS_MAX      = 40;
 export const SLIDE_MODEL_DEFAULT    = 'codex-default';
+export const MODEL_DEFAULT          = 'claude-sonnet-4-6';
 
 export const MODELS = [
   { id: 'codex-default',              engine: 'codex',  cliModel: null,                          name: 'Codex',      desc: 'OpenAI Codex · usa o modelo configurado no Codex CLI' },
@@ -44,11 +45,11 @@ export const MODELS = [
 
 // --- Modelo de chat -------------------------------------------------------
 
-/** Retorna o id do modelo salvo (ou default MODELS[0]). */
+/** Retorna o id do modelo salvo (ou MODEL_DEFAULT). */
 export function getModel() {
   const saved = _lsGet(MODEL_KEY);
   if (saved && MODELS.some(m => m.id === saved)) return saved;
-  return MODELS[0].id;
+  return MODEL_DEFAULT;
 }
 
 /**
@@ -61,13 +62,15 @@ export function setModelId(id) {
   import('./state.js').then(({ state }) => { state.chat.model = id; }).catch(() => {});
 }
 
-/** Retorna o nome display do modelo (ou do primeiro se id desconhecido). */
+/** Retorna o nome display do modelo (ou do default se id desconhecido). */
 export function modelName(id) {
-  return (MODELS.find(m => m.id === id) || MODELS[0]).name;
+  return modelConfig(id).name;
 }
 
 export function modelConfig(id) {
-  return MODELS.find(m => m.id === id) || MODELS[0];
+  return MODELS.find(m => m.id === id)
+    || MODELS.find(m => m.id === MODEL_DEFAULT)
+    || MODELS[0];
 }
 
 // --- Modelo de slides -----------------------------------------------------
