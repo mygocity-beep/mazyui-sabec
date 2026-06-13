@@ -30,16 +30,34 @@ function escapeHtmlInternal(s) {
  */
 export function renderChatMarkdown(text) {
   const src = text == null ? '' : String(text);
+  
+  const injectInlineCopy = (html) => {
+    // Replace raw <p><span>...</span></p>
+    let res = html.replace(/<p>\s*<span>([\s\S]*?)<\/span>\s*<\/p>/gi, (match, content) => {
+      const plain = content.replace(/<[^>]*>/g, '').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"');
+      return `<p class="transcription-para"><span>${content}</span><button class="copy-inline-btn" data-copy-text="${escapeHtmlInternal(plain)}" title="Copiar transcrição"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button></p>`;
+    });
+
+    // Replace escaped &lt;p&gt;&lt;span&gt;...&lt;/span&gt;&lt;/p&gt;
+    res = res.replace(/&lt;p&gt;\s*&lt;span&gt;([\s\S]*?)&lt;\/span&gt;&lt;\/p&gt;/gi, (match, content) => {
+      const plain = content.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&quot;/g, '"');
+      return `<p class="transcription-para"><span>${content}</span><button class="copy-inline-btn" data-copy-text="${escapeHtmlInternal(plain)}" title="Copiar transcrição"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button></p>`;
+    });
+    return res;
+  };
+
   // Guard: em Node (smoke test) `marked` não existe — retorna pre escapado.
   if (typeof marked === 'undefined' || !marked.parse) {
-    return `<pre style="margin:0;white-space:pre-wrap;font-family:inherit">${escapeHtmlInternal(src)}</pre>`;
+    return `<pre style="margin:0;white-space:pre-wrap;font-family:inherit">${injectInlineCopy(escapeHtmlInternal(src))}</pre>`;
   }
   try {
-    return marked.parse(src, { breaks: true, gfm: true });
+    const parsed = marked.parse(src, { breaks: true, gfm: true });
+    return injectInlineCopy(parsed);
   } catch {
-    return escapeHtmlInternal(src);
+    return injectInlineCopy(escapeHtmlInternal(src));
   }
 }
+
 
 /* ============================================================
    Memory / identity extractors

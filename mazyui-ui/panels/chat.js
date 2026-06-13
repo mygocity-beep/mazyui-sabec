@@ -198,6 +198,15 @@ function wireModelPicker(container) {
 // ---------------------------------------------------------------------------
 
 function renderTurnHTML(turn) {
+  const copyBtnHTML = `
+    <button class="turn-copy-btn" data-turn-id="${turn.id}" title="Copiar mensagem">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;display:inline-block;vertical-align:middle;">
+        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+      </svg>
+    </button>
+  `;
+
   if (turn.kind === 'user') {
     const atts = Array.isArray(turn.attachments) ? turn.attachments : [];
     const attHTML = atts.length ? `
@@ -212,7 +221,10 @@ function renderTurnHTML(turn) {
       const params = turn.text.startsWith(cmd) ? turn.text.slice(cmd.length).trim() : '';
       return `
         <div class="turn turn-user" id="turn-${turn.id}">
-          <div class="turn-head">você</div>
+          <div class="turn-head">
+            <span>você</span>
+            ${copyBtnHTML}
+          </div>
           <div class="turn-body">
             <div class="skill-cmd">${escapeHtml(cmd)}</div>
             ${params ? `<div class="skill-params">${escapeHtml(params)}</div>` : ''}
@@ -222,9 +234,12 @@ function renderTurnHTML(turn) {
     }
     return `
       <div class="turn turn-user" id="turn-${turn.id}">
-        <div class="turn-head">você</div>
+        <div class="turn-head">
+          <span>você</span>
+          ${copyBtnHTML}
+        </div>
         <div class="turn-body">
-          ${turn.text ? `<div class="free-text">${escapeHtml(turn.text)}</div>` : ''}
+          ${turn.text ? `<div class="free-text">${renderChatMarkdown(turn.text)}</div>` : ''}
           ${attHTML}
         </div>
       </div>`;
@@ -235,7 +250,10 @@ function renderTurnHTML(turn) {
   if (turn.status === 'error') cls.push('error');
   return `
     <div class="${cls.join(' ')}" id="turn-${turn.id}">
-      <div class="turn-head">sabec</div>
+      <div class="turn-head">
+        <span>sabec</span>
+        ${copyBtnHTML}
+      </div>
       <div class="turn-body">
         <div class="run-log" id="log-${turn.id}">
           ${turn.events.map(ev => ev.kind === 'text'
@@ -362,6 +380,53 @@ function onMount(container, ctx) {
   ctx.setTopbar(state.business.name || 'Chat', 'Chat');
   updateChatStatus();
   scrollChatToBottom();
+
+  // --- Copy button delegation ---
+  container.addEventListener('click', async (e) => {
+    // 1. Inline copy button
+    const inlineBtn = e.target.closest('.copy-inline-btn');
+    if (inlineBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      const textToCopy = inlineBtn.getAttribute('data-copy-text');
+      if (textToCopy) {
+        try {
+          await navigator.clipboard.writeText(textToCopy);
+          toast('Transcrição copiada!');
+        } catch (err) {
+          toast('Não consegui copiar');
+        }
+      }
+      return;
+    }
+
+    // 2. Turn level copy button
+    const turnBtn = e.target.closest('.turn-copy-btn');
+    if (turnBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      const turnId = turnBtn.dataset.turnId;
+      const turn = state.chat.turns.find(t => t.id === turnId);
+      if (turn) {
+        let textToCopy = '';
+        if (turn.kind === 'user') {
+          textToCopy = turn.text || '';
+        } else {
+          textToCopy = (turn.events || [])
+            .filter(ev => ev.kind === 'text')
+            .map(ev => ev.text)
+            .join('\n');
+        }
+        try {
+          await navigator.clipboard.writeText(textToCopy);
+          toast('Mensagem copiada!');
+        } catch (err) {
+          toast('Não consegui copiar');
+        }
+      }
+      return;
+    }
+  });
 
   // --- Nova conversa ---
   container.querySelector('#chat-reset').onclick = () => {
